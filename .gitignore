@@ -1,0 +1,4 @@
+node_modules/
+inventory.db
+public/uploads/*
+!public/uploads/.gitkeep

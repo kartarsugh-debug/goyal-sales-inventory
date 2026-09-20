@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Goyal Sales Inventory</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--text:#172033;--muted:#687386;--line:#e4e9f0;--primary:#2457d6;--danger:#d33b45;--shadow:0 8px 28px rgba(20,35,70,.08)}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select{font:inherit}button{cursor:pointer;border:0}.hidden{display:none!important}
+.login{min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(135deg,#eef3ff,#f8fafc)}
+.login-card{width:min(420px,100%);background:#fff;padding:34px;border-radius:20px;box-shadow:var(--shadow);border:1px solid var(--line)}
+.logo-box{height:72px;display:flex;align-items:center;justify-content:center;margin-bottom:18px}.logo-box img{max-height:68px;max-width:220px}.logo-fallback{font-size:26px;font-weight:800;color:var(--primary)}
+h1,h2,h3{margin:0 0 10px}.muted{color:var(--muted)}.field{margin:14px 0}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+.field input,.field select,.search{width:100%;padding:12px 13px;border:1px solid #d7deea;border-radius:10px;outline:none;background:#fff}.field input:focus,.search:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(36,87,214,.1)}
+.primary{background:var(--primary);color:#fff;padding:11px 16px;border-radius:10px;font-weight:700}.secondary{background:#eef2f8;color:#23304a;padding:10px 14px;border-radius:10px;font-weight:700}.danger{background:#fff0f1;color:var(--danger);padding:9px 12px;border-radius:9px}.small{font-size:12px}
+.top{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}.nav{max-width:1400px;margin:auto;padding:12px 20px;display:flex;align-items:center;gap:18px}.brand{display:flex;align-items:center;gap:10px;font-weight:800;min-width:250px}.brand img{max-height:40px;max-width:130px}.brand-name{font-size:18px}.nav-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.container{max-width:1400px;margin:22px auto;padding:0 20px}.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:15px}.search-wrap{flex:1;position:relative}.search{padding-left:40px}.search-icon{position:absolute;left:14px;top:11px;color:#8791a4}
+.tabs{display:flex;gap:8px;margin-bottom:16px;overflow:auto}.tab{padding:10px 14px;border-radius:10px;background:#e9eef7;color:#35415a;font-weight:700;white-space:nowrap}.tab.active{background:var(--primary);color:#fff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:800px}th,td{padding:12px 13px;border-bottom:1px solid var(--line);text-align:left;font-size:14px;white-space:nowrap}th{background:#f8faff;color:#516079;font-size:12px;text-transform:uppercase;letter-spacing:.03em}tr:hover td{background:#fafcff}
+.actions{display:flex;gap:6px}.empty{text-align:center;padding:40px;color:var(--muted)}
+.modal{position:fixed;inset:0;background:rgba(14,23,42,.5);display:grid;place-items:center;padding:20px;z-index:30}.modal-card{width:min(650px,100%);background:#fff;border-radius:16px;padding:22px;max-height:90vh;overflow:auto}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid .field{margin:7px 0}.footer{text-align:center;padding:25px 10px;color:#9aa3b3;font-size:11px}
+.badge{padding:4px 8px;border-radius:20px;background:#edf2ff;color:#3156ad;font-size:11px;font-weight:700}.admin-only{display:none}.is-admin .admin-only{display:block}
+.toast{position:fixed;right:20px;bottom:20px;background:#172033;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:var(--shadow);z-index:50}
+@media(max-width:760px){.nav{padding:10px 12px}.brand{min-width:0}.brand-name{display:none}.container{padding:0 12px}.toolbar{flex-wrap:wrap}.nav-right .user-label{display:none}.grid{grid-template-columns:1fr}.nav{gap:8px}}
+</style>
+</head>
+<body>
+<div id="login" class="login">
+  <div class="login-card">
+    <div class="logo-box"><img id="loginLogo" class="hidden"><div id="loginFallback" class="logo-fallback">GOYAL SALES</div></div>
+    <h2>Goyal Sales Inventory</h2>
+    <p class="muted">Secure inventory management</p>
+    <form id="loginForm">
+      <div class="field"><label>Login ID</label><input id="loginUser" value="Goyal sales" required></div>
+      <div class="field"><label>Password</label><input id="loginPass" type="password" placeholder="Enter password" required></div>
+      <button class="primary" style="width:100%">Login</button>
+    </form>
+    <p class="small muted" style="margin-top:15px">Default admin: Goyal sales / goyal@7250</p>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+<header class="top"><div class="nav">
+  <div class="brand"><img id="navLogo" class="hidden"><span id="brandName" class="brand-name">Goyal Sales Inventory</span></div>
+  <div class="nav-right"><span id="roleBadge" class="badge"></span><span class="user-label" id="userLabel"></span><button id="logoutBtn" class="secondary">Logout</button></div>
+</div></header>
+<main class="container">
+  <div class="tabs">
+    <button class="tab active" data-tab="products">Products</button>
+    <button class="tab admin-only" data-tab="history">History</button>
+    <button class="tab admin-only" data-tab="users">Users & Access</button>
+    <button class="tab admin-only" data-tab="settings">Settings</button>
+  </div>
+
+  <section id="productsTab">
+    <div class="toolbar">
+      <div class="search-wrap"><span class="search-icon">⌕</span><input id="search" class="search" placeholder="Search product, brand or product code..."></div>
+      <button id="addBtn" class="primary admin-only">+ Add Product</button>
+      <button id="exportBtn" class="secondary">Export Excel</button>
+    </div>
+    <div class="card"><div class="table-wrap"><table><thead><tr>
+      <th>Product Name</th><th>Brand</th><th>Product Code</th><th>Pieces / Box</th><th>MRP</th><th>Rate</th><th class="admin-only">Actions</th>
+    </tr></thead><tbody id="productRows"></tbody></table></div></div>
+  </section>
+
+  <section id="historyTab" class="hidden"><div class="card"><div class="table-wrap"><table><thead><tr><th>Date/Time</th><th>Action</th><th>Product</th><th>Code</th><th>Changed By</th><th>Details</th></tr></thead><tbody id="historyRows"></tbody></table></div></div></section>
+
+  <section id="usersTab" class="hidden">
+    <div class="toolbar"><button id="addUserBtn" class="primary">+ Add User</button></div>
+    <div class="card"><div class="table-wrap"><table><thead><tr><th>Username</th><th>Role</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody id="userRows"></tbody></table></div></div>
+  </section>
+
+  <section id="settingsTab" class="hidden">
+    <div class="card" style="padding:20px;max-width:700px">
+      <h3>Company & Logo</h3>
+      <div class="field"><label>Company Name</label><input id="companyName"></div>
+      <div class="field"><label>Footer Text</label><input id="footerText"></div>
+      <button id="saveSettings" class="primary">Save Settings</button>
+      <hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
+      <div class="field"><label>Upload Logo</label><input id="logoFile" type="file" accept="image/*"></div>
+      <button id="uploadLogo" class="secondary">Upload Logo</button>
+      <p class="small muted">Logo appears on the login and dashboard. Keep it simple and readable.</p>
+    </div>
+  </section>
+  <div class="footer" id="footer"></div>
+</main>
+</div>
+
+<div id="modal" class="modal hidden"><div class="modal-card" id="modalCard"></div></div>
+<div id="toast" class="toast hidden"></div>
+
+<script>
+let me=null, products=[], settings={};
+
+const $=id=>document.getElementById(id);
+function toast(msg){$("toast").textContent=msg;$("toast").classList.remove("hidden");setTimeout(()=>$("toast").classList.add("hidden"),2600)}
+async function api(url,opt={}){const r=await fetch(url,opt);let d={};try{d=await r.json()}catch{}if(!r.ok)throw new Error(d.error||"Request failed");return d}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+async function loadSettings(){
+  settings=await api("/api/settings");
+  $("brandName").textContent=settings.company_name;
+  $("footer").textContent=settings.footer;
+  if(settings.logo){$("navLogo").src=settings.logo;$("navLogo").classList.remove("hidden");$("loginLogo").src=settings.logo;$("loginLogo").classList.remove("hidden");$("loginFallback").classList.add("hidden")}
+  else{$("navLogo").classList.add("hidden");$("loginLogo").classList.add("hidden");$("loginFallback").classList.remove("hidden")}
+  $("companyName").value=settings.company_name;$("footerText").value=settings.footer;
+}
+async function loadProducts(){
+  products=await api("/api/products?q="+encodeURIComponent($("search").value));
+  const rows=$("productRows");
+  rows.innerHTML=products.length?products.map(p=>`<tr>
+    <td>${esc(p.product_name)}</td><td>${esc(p.brand_name)}</td><td>${esc(p.product_code)}</td><td>${p.pieces_per_box}</td>
+    <td>₹${Number(p.mrp).toFixed(2)}</td><td>₹${Number(p.rate).toFixed(2)}</td>
+    <td class="admin-only"><div class="actions"><button class="secondary small" onclick="editProduct(${p.id})">Edit</button><button class="danger small" onclick="deleteProduct(${p.id})">Delete</button></div></td>
+  </tr>`).join(""):`<tr><td colspan="7" class="empty">No products found.</td></tr>`;
+  applyRole();
+}
+function applyRole(){
+  document.body.classList.toggle("is-admin",me?.role==="admin");
+  $("roleBadge").textContent=me?.role==="admin"?"ADMIN":"VIEWER";
+  $("userLabel").textContent=me?.username||"";
+}
+function openProduct(p={}){
+  $("modalCard").innerHTML=`<div class="modal-head"><h3>${p.id?"Edit Product":"Add Product"}</h3><button class="secondary" onclick="closeModal()">Close</button></div>
+  <form id="productForm"><div class="grid">
+  <div class="field"><label>Product Name *</label><input name="product_name" value="${esc(p.product_name)}" required></div>
+  <div class="field"><label>Brand Name *</label><input name="brand_name" value="${esc(p.brand_name)}" required></div>
+  <div class="field"><label>Product Code *</label><input name="product_code" value="${esc(p.product_code)}" required></div>
+  <div class="field"><label>1 Box = Pieces *</label><input name="pieces_per_box" type="number" min="1" value="${p.pieces_per_box||1}" required></div>
+  <div class="field"><label>MRP</label><input name="mrp" type="number" min="0" step="0.01" value="${p.mrp||0}"></div>
+  <div class="field"><label>Rate</label><input name="rate" type="number" min="0" step="0.01" value="${p.rate||0}"></div>
+  </div><button class="primary" style="margin-top:12px">${p.id?"Update Product":"Add Product"}</button></form>`;
+  $("productForm").onsubmit=async e=>{e.preventDefault();const data=Object.fromEntries(new FormData(e.target));
+    try{await api(p.id?"/api/products/"+p.id:"/api/products",{method:p.id?"PUT":"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});closeModal();await loadProducts();toast(p.id?"Product updated":"Product added")}catch(err){toast(err.message)}
+  };
+  $("modal").classList.remove("hidden");
+}
+function closeModal(){$("modal").classList.add("hidden")}
+window.closeModal=closeModal;
+window.editProduct=id=>openProduct(products.find(p=>p.id===id));
+window.deleteProduct=async id=>{if(!confirm("Delete this product? This action will be recorded in history."))return;try{await api("/api/products/"+id,{method:"DELETE"});await loadProducts();toast("Product deleted")}catch(e){toast(e.message)}};
+
+async function loadHistory(){
+  const h=await api("/api/history");$("historyRows").innerHTML=h.length?h.map(x=>`<tr><td>${esc(x.changed_at)}</td><td><span class="badge">${esc(x.action)}</span></td><td>${esc(x.product_name||"-")}</td><td>${esc(x.product_code||"-")}</td><td>${esc(x.changed_by)}</td><td><button class="secondary small" onclick='showHistory(${JSON.stringify(x).replace(/'/g,"&#39;")})'>View</button></td></tr>`).join(""):`<tr><td colspan="6" class="empty">No history yet.</td></tr>`;
+}
+window.showHistory=x=>{let old=x.old_data?JSON.parse(x.old_data):null,newD=x.new_data?JSON.parse(x.new_data):null;$("modalCard").innerHTML=`<div class="modal-head"><h3>Change Details</h3><button class="secondary" onclick="closeModal()">Close</button></div><p><b>Action:</b> ${esc(x.action)} &nbsp; <b>By:</b> ${esc(x.changed_by)} &nbsp; <b>Time:</b> ${esc(x.changed_at)}</p><div class="grid"><div><h4>Old</h4><pre>${esc(old?JSON.stringify(old,null,2):"—")}</pre></div><div><h4>New</h4><pre>${esc(newD?JSON.stringify(newD,null,2):"—")}</pre></div></div>`;$("modal").classList.remove("hidden")};
+
+async function loadUsers(){
+  const u=await api("/api/users");$("userRows").innerHTML=u.map(x=>`<tr><td>${esc(x.username)}</td><td><span class="badge">${esc(x.role)}</span></td><td>${x.active?"Active":"Disabled"}</td><td>${esc(x.created_at)}</td><td><div class="actions"><button class="secondary small" onclick='editUser(${JSON.stringify(x)})'>Edit</button><button class="danger small" onclick="deleteUser(${x.id})">Delete</button></div></td></tr>`).join("");
+}
+function userForm(u={}){
+  $("modalCard").innerHTML=`<div class="modal-head"><h3>${u.id?"Edit User":"Add User"}</h3><button class="secondary" onclick="closeModal()">Close</button></div><form id="userForm">
+  <div class="field"><label>Login ID</label><input name="username" value="${esc(u.username||"")}" ${u.id?"disabled":""} required></div>
+  <div class="field"><label>${u.id?"New Password (leave blank to keep current)":"Password"}</label><input name="password" type="password" ${u.id?"":"required"}></div>
+  <div class="grid"><div class="field"><label>Role</label><select name="role"><option value="viewer" ${u.role==="viewer"?"selected":""}>Viewer</option><option value="admin" ${u.role==="admin"?"selected":""}>Admin</option></select></div>
+  <div class="field"><label>Status</label><select name="active"><option value="1" ${u.active!==0?"selected":""}>Active</option><option value="0" ${u.active===0?"selected":""}>Disabled</option></select></div></div>
+  <button class="primary">Save</button></form>`;
+  $("userForm").onsubmit=async e=>{e.preventDefault();let data=Object.fromEntries(new FormData(e.target));data.active=data.active==="1";try{await api(u.id?"/api/users/"+u.id:"/api/users",{method:u.id?"PUT":"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});closeModal();await loadUsers();toast("User saved")}catch(err){toast(err.message)}};
+  $("modal").classList.remove("hidden");
+}
+window.editUser=userForm;
+$("addUserBtn").onclick=()=>userForm({});
+window.deleteUser=async id=>{if(!confirm("Delete this user?"))return;try{await api("/api/users/"+id,{method:"DELETE"});await loadUsers();toast("User deleted")}catch(e){toast(e.message)}};
+
+$("search").addEventListener("input",()=>loadProducts());
+$("addBtn").onclick=()=>openProduct({});
+$("exportBtn").onclick=async()=>{
+  const q=$("search").value.trim();
+  // Create a real .xlsx in the browser from the exact filtered result set.
+  const rows=await api("/api/products?q="+encodeURIComponent(q));
+  const data=rows.map(p=>({"Product Name":p.product_name,"Brand Name":p.brand_name,"Product Code":p.product_code,"Pieces/Box":p.pieces_per_box,"MRP":p.mrp,"Rate":p.rate}));
+  const ws=XLSX.utils.json_to_sheet(data); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Inventory");
+  XLSX.writeFile(wb,`goyal-sales-${q?"filtered":"inventory"}.xlsx`); toast(q?`Exported ${data.length} filtered product(s)`:`Exported ${data.length} product(s)`);
+};
+
+document.querySelectorAll(".tab").forEach(b=>b.onclick=async()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");
+  ["products","history","users","settings"].forEach(t=>$(`${t}Tab`).classList.add("hidden"));
+  const t=b.dataset.tab;$(`${t}Tab`).classList.remove("hidden");
+  if(t==="history")await loadHistory();if(t==="users")await loadUsers();
+});
+
+$("saveSettings").onclick=async()=>{try{await api("/api/settings",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({company_name:$("companyName").value,footer:$("footerText").value})});await loadSettings();toast("Settings saved")}catch(e){toast(e.message)}};
+$("uploadLogo").onclick=async()=>{const f=$("logoFile").files[0];if(!f)return toast("Select a logo first");const fd=new FormData();fd.append("logo",f);try{await api("/api/logo",{method:"POST",body:fd});await loadSettings();toast("Logo uploaded")}catch(e){toast(e.message)}};
+$("logoutBtn").onclick=async()=>{await api("/api/logout",{method:"POST"});location.reload()};
+$("loginForm").onsubmit=async e=>{e.preventDefault();try{const d=await api("/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:$("loginUser").value,password:$("loginPass").value})});me=d.user;$("login").classList.add("hidden");$("app").classList.remove("hidden");applyRole();await loadSettings();await loadProducts()}catch(err){toast(err.message)}};
+
+(async()=>{try{const d=await api("/api/me");if(d.user){me=d.user;$("login").classList.add("hidden");$("app").classList.remove("hidden");applyRole();await loadSettings();await loadProducts() }else await loadSettings()}catch{}})();
+</script>
+</body></html>
